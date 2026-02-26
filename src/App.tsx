@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Analytics } from "@vercel/analytics/react"
 import { UploadStep } from "@/components/UploadStep"
 import { ConfigureStep } from "@/components/ConfigureStep"
 import { Badge } from "@/components/ui/badge"
@@ -91,6 +92,7 @@ export default function App() {
           />
         )}
       </main>
+      <Analytics />
     </div>
   )
 }
