@@ -171,6 +171,7 @@ function resolveStyle(
 ): ExcelJS.Style {
   const rRule = rowFormats.find((r) => r.rowType === rowTypeVal)
   let bgColor   = rRule?.bgColor   ?? ""
+  let fontColor = rRule?.fontColor ?? ""
   let bold      = rRule?.bold      ?? false
   let italic    = rRule?.italic    ?? false
   let underline = rRule?.underline ?? false
@@ -189,6 +190,7 @@ function resolveStyle(
   })
   if (cRule) {
     if (cRule.bgColor)   bgColor   = cRule.bgColor
+    if (cRule.fontColor) fontColor = cRule.fontColor
     if (cRule.bold)      bold      = cRule.bold
     if (cRule.italic)    italic    = cRule.italic
     if (cRule.underline) underline = cRule.underline
@@ -200,7 +202,7 @@ function resolveStyle(
     font: {
       name: fontName, size: fontSize, bold, italic,
       underline: underline ? "single" : undefined,
-      color: { argb: "FF000000" },
+      color: { argb: fontColor ? toArgb(fontColor) : "FF000000" },
     },
     alignment: { horizontal: "center", vertical: "middle", wrapText: false },
     border: thinBox,
@@ -576,6 +578,7 @@ function writeConfigSheet(wb: ExcelJS.Workbook, config: AppConfig): void {
         if (k2l === "row bold") snapshot[j][1] = fmt.bold ? "true" : "false"
         if (k2l === "row italic") snapshot[j][1] = fmt.italic ? "true" : "false"
         if (k2l === "row bg color") snapshot[j][1] = fmt.bgColor
+        if (k2l === "row font color") snapshot[j][1] = fmt.fontColor
         if (k2l === "row font size") snapshot[j][1] = String(fmt.fontSize)
         if (k2l === "row font name") snapshot[j][1] = fmt.fontName
         j++
@@ -592,6 +595,7 @@ function writeConfigSheet(wb: ExcelJS.Workbook, config: AppConfig): void {
       snapshot.push(["Row Bold", fmt.bold ? "true" : "false"])
       snapshot.push(["Row Italic", fmt.italic ? "true" : "false"])
       snapshot.push(["Row BG Color", fmt.bgColor])
+      snapshot.push(["Row Font Color", fmt.fontColor])
       snapshot.push(["Row Font Size", String(fmt.fontSize)])
       snapshot.push(["Row Font Name", fmt.fontName])
     }
@@ -610,6 +614,7 @@ function writeConfigSheet(wb: ExcelJS.Workbook, config: AppConfig): void {
         if (k2l === "override bold") snapshot[j][1] = String(cond.bold)
         if (k2l === "override italic") snapshot[j][1] = String(cond.italic)
         if (k2l === "override bg color") snapshot[j][1] = cond.bgColor
+        if (k2l === "override font color") snapshot[j][1] = cond.fontColor
         if (k2l === "override font size") snapshot[j][1] = String(cond.fontSize)
         if (k2l === "override font name") snapshot[j][1] = cond.fontName
         j++
@@ -627,6 +632,7 @@ function writeConfigSheet(wb: ExcelJS.Workbook, config: AppConfig): void {
       snapshot.push(["Override Bold", String(cond.bold)])
       snapshot.push(["Override Italic", String(cond.italic)])
       snapshot.push(["Override BG Color", cond.bgColor])
+      snapshot.push(["Override Font Color", cond.fontColor])
       snapshot.push(["Override Font Size", String(cond.fontSize)])
       snapshot.push(["Override Font Name", cond.fontName])
     }

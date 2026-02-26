@@ -215,7 +215,8 @@ export async function buildPdf(
       const rowTypeVal = rowTypeIndex[rowIdx] ?? ""
 
       const rRule = rowFormats.find((r: RowFormatRule) => r.rowType === rowTypeVal)
-      let bgColor: string | null = rRule?.bgColor || null
+      let bgColor:   string | null = rRule?.bgColor   || null
+      let fontColor: string | null = rRule?.fontColor || null
       let bold    = rRule?.bold    ?? false
       let italic  = rRule?.italic  ?? false
 
@@ -230,13 +231,15 @@ export async function buildPdf(
         return (bodyRows[rowIdx] ?? []).some((v) => globMatch(c.contains, v))
       })
       if (cRule) {
-        if (cRule.bgColor) bgColor = cRule.bgColor
-        if (cRule.bold)    bold    = cRule.bold
-        if (cRule.italic)  italic  = cRule.italic
+        if (cRule.bgColor)   bgColor   = cRule.bgColor
+        if (cRule.fontColor) fontColor = cRule.fontColor
+        if (cRule.bold)      bold      = cRule.bold
+        if (cRule.italic)    italic    = cRule.italic
       }
 
       const out: ReturnType<typeof cellStyle> = {}
       if (bgColor)         out.fillColor  = hexToRgb(bgColor)
+      if (fontColor)       out.textColor  = hexToRgb(fontColor)
       if (bold && italic)  out.fontStyle  = "bolditalic"
       else if (bold)       out.fontStyle  = "bold"
       else if (italic)     out.fontStyle  = "italic"
@@ -270,8 +273,9 @@ export async function buildPdf(
       didParseCell: (data) => {
         if (data.section !== "body") return
         const s = cellStyle(data.row.index, data.column.index)
-        if (s.fillColor) data.cell.styles.fillColor = s.fillColor
-        if (s.fontStyle) data.cell.styles.fontStyle = s.fontStyle
+        if (s.fillColor)  data.cell.styles.fillColor  = s.fillColor
+        if (s.fontStyle)  data.cell.styles.fontStyle  = s.fontStyle
+        if (s.textColor)  data.cell.styles.textColor  = s.textColor
       },
       didDrawPage: (data) => {
         // Footer

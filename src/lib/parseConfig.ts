@@ -75,6 +75,9 @@ export function parseConfigSheet(rows: unknown[][]): Partial<AppConfig> | null {
       case "row bg color":
         if (currentRowFmt) currentRowFmt.bgColor = value
         break
+      case "row font color":
+        if (currentRowFmt) currentRowFmt.fontColor = value
+        break
       case "row style":
         if (currentRowFmt) {
           const p = value.toLowerCase().split(",").map(s => s.trim())
@@ -108,6 +111,9 @@ export function parseConfigSheet(rows: unknown[][]): Partial<AppConfig> | null {
       case "override colour":
       case "override bg color":
         if (currentCond) currentCond.bgColor = value
+        break
+      case "override font color":
+        if (currentCond) currentCond.fontColor = value
         break
       case "override style":
         if (currentCond) {

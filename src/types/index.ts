@@ -13,6 +13,7 @@ export interface RowFormatRule {
   id: string
   rowType: string     // value matched against typeColumn
   bgColor: string     // hex "#RRGGBB"; "" = no fill
+  fontColor: string   // hex "#RRGGBB"; "" = default black
   bold: boolean
   italic: boolean
   underline: boolean
@@ -25,6 +26,7 @@ export interface CellConditionRule {
   column: string      // column header to check; "" = any column
   contains: string    // case-insensitive substring match
   bgColor: string
+  fontColor: string   // hex "#RRGGBB"; "" = default black
   bold: boolean
   italic: boolean
   underline: boolean
@@ -90,6 +92,7 @@ export function makeRowFormatRule(rowType: string): RowFormatRule {
     id: `rfr-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     rowType,
     bgColor: "",
+    fontColor: "",
     bold: false,
     italic: false,
     underline: false,
@@ -104,6 +107,7 @@ export function makeCellConditionRule(): CellConditionRule {
     column: "",
     contains: "",
     bgColor: "",
+    fontColor: "",
     bold: false,
     italic: false,
     underline: false,

@@ -18,21 +18,22 @@ const ANY_COLUMN_SENTINEL = "__any__"
 
 interface StyleEditorProps {
   bgColor:   string
+  fontColor: string
   bold:      boolean
   italic:    boolean
   underline: boolean
   fontSize:  number
   fontName:  string
   onChange: (patch: Partial<{
-    bgColor: string; bold: boolean; italic: boolean;
+    bgColor: string; fontColor: string; bold: boolean; italic: boolean;
     underline: boolean; fontSize: number; fontName: string
   }>) => void
 }
 
-function StyleEditor({ bgColor, bold, italic, underline, fontSize, fontName, onChange }: StyleEditorProps) {
+function StyleEditor({ bgColor, fontColor, bold, italic, underline, fontSize, fontName, onChange }: StyleEditorProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Color picker */}
+      {/* Background color picker */}
       <label className="relative cursor-pointer" title="Background colour">
         <div
           className="w-7 h-7 rounded border border-input"
@@ -79,6 +80,19 @@ function StyleEditor({ bgColor, bold, italic, underline, fontSize, fontName, onC
           ))}
         </SelectContent>
       </Select>
+      {/* Font color picker */}
+      <label className="relative cursor-pointer" title="Font colour">
+        <div className="w-7 h-7 rounded border border-input relative flex flex-col items-center justify-center gap-0.5">
+          <span className="text-sm font-bold leading-none" style={{ color: fontColor || "#000000" }}>A</span>
+          <div className="w-4 h-1 rounded-sm" style={{ backgroundColor: fontColor || "#000000" }} />
+        </div>
+        <input
+          type="color"
+          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+          value={fontColor || "#000000"}
+          onChange={(e) => onChange({ fontColor: e.target.value })}
+        />
+      </label>
     </div>
   )
 }
@@ -136,15 +150,26 @@ export function FormattingCard({
           {usedRowTypes.map((rt) => {
             const rule = rowFormats.find((r) => r.rowType === rt) ?? makeRowFormatRule(rt)
             return (
-              <div key={rt} className="flex flex-wrap items-center gap-3 p-2 border rounded-md bg-muted/20">
-                <span
-                  className="text-sm font-medium min-w-[120px]"
-                  style={{ fontFamily: rule.fontName }}
+              <div key={rt} className="flex flex-col gap-2 p-2 border rounded-md bg-muted/20">
+                {/* Live preview */}
+                <div
+                  className="px-3 py-1.5 rounded text-sm min-w-[120px] w-full"
+                  style={{
+                    fontFamily: rule.fontName,
+                    fontSize: `${rule.fontSize}px`,
+                    fontWeight: rule.bold ? "bold" : "normal",
+                    fontStyle: rule.italic ? "italic" : "normal",
+                    textDecoration: rule.underline ? "underline" : "none",
+                    backgroundColor: rule.bgColor || "transparent",
+                    color: rule.fontColor || "inherit",
+                    border: rule.bgColor ? "none" : "1px dashed rgba(128,128,128,0.3)",
+                  }}
                 >
                   {rt}
-                </span>
+                </div>
                 <StyleEditor
                   bgColor={rule.bgColor}
+                  fontColor={rule.fontColor}
                   bold={rule.bold}
                   italic={rule.italic}
                   underline={rule.underline}
@@ -207,6 +232,7 @@ export function FormattingCard({
                 <Label className="text-xs">Style override</Label>
                 <StyleEditor
                   bgColor={rule.bgColor}
+                  fontColor={rule.fontColor}
                   bold={rule.bold}
                   italic={rule.italic}
                   underline={rule.underline}
