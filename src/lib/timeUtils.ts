@@ -61,3 +61,14 @@ export function formatMMSS(seconds: number): string {
   const s = seconds % 60
   return `${m}:${String(s).padStart(2, "0")}`
 }
+
+/**
+ * Case-insensitive glob match. `*` is a wildcard matching any sequence of characters.
+ * Examples: "P*" matches "P1","P2","PLAY" but not "STOP"; "*P" matches "STOP" but not "P1".
+ * No wildcard = exact match.
+ */
+export function globMatch(pattern: string, value: string): boolean {
+  if (!pattern) return false
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")
+  return new RegExp(`^${escaped}$`, "i").test(value)
+}

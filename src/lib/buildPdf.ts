@@ -1,7 +1,7 @@
 ﻿import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 import type { AppConfig, TitleBlock, RowFormatRule, CellConditionRule } from "@/types"
-import { parseTimeToSeconds, hasGap } from "@/lib/timeUtils"
+import { parseTimeToSeconds, hasGap, globMatch } from "@/lib/timeUtils"
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -210,22 +210,24 @@ export async function buildPdf(
     // ─ Resolve style for a cell ─
     function cellStyle(
       rowIdx: number,
-      colIdx: number,
+      _colIdx: number,
     ): { fillColor?: [number, number, number]; fontStyle?: "bold" | "italic" | "bolditalic" | "normal"; textColor?: [number, number, number] } {
       const rowTypeVal = rowTypeIndex[rowIdx] ?? ""
-      const colHeader  = columns[colIdx] ?? ""
-      const cellVal    = bodyRows[rowIdx]?.[colIdx] ?? ""
 
       const rRule = rowFormats.find((r: RowFormatRule) => r.rowType === rowTypeVal)
       let bgColor: string | null = rRule?.bgColor || null
       let bold    = rRule?.bold    ?? false
       let italic  = rRule?.italic  ?? false
 
-      const cellStr = cellVal.toLowerCase()
+      // Override: condition evaluated against the row; applies to entire line
       const cRule = cellConditions.find((c: CellConditionRule) => {
-        const inCol  = !c.column || c.column === colHeader
-        const match  = c.contains && cellStr.includes(c.contains.toLowerCase())
-        return inCol && !!match
+        if (!c.contains) return false
+        if (c.column) {
+          const ci = columns.indexOf(c.column)
+          if (ci < 0) return false
+          return globMatch(c.contains, bodyRows[rowIdx]?.[ci] ?? "")
+        }
+        return (bodyRows[rowIdx] ?? []).some((v) => globMatch(c.contains, v))
       })
       if (cRule) {
         if (cRule.bgColor) bgColor = cRule.bgColor

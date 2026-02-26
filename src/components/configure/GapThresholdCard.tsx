@@ -2,15 +2,25 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { parseMMSSInput, formatMMSS } from "@/lib/timeUtils"
 import type { AppConfig } from "@/types"
 
+const NONE_VALUE = "__none__"
+
 interface GapThresholdCardProps {
   config: AppConfig
+  columns: string[]
   onChange: (patch: Partial<AppConfig>) => void
 }
 
-export function GapThresholdCard({ config, onChange }: GapThresholdCardProps) {
+export function GapThresholdCard({ config, columns, onChange }: GapThresholdCardProps) {
   const [inputValue, setInputValue] = useState(
     config.gapThresholdSeconds > 0 ? formatMMSS(config.gapThresholdSeconds) : "",
   )
@@ -39,7 +49,34 @@ export function GapThresholdCard({ config, onChange }: GapThresholdCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Gap Threshold</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
+        {/* Time column selector */}
+        <div className="space-y-2">
+          <Label htmlFor="time-column">Time column (optional)</Label>
+          <Select
+            value={config.timeColumn || NONE_VALUE}
+            onValueChange={(v) =>
+              onChange({ timeColumn: v === NONE_VALUE ? "" : v })
+            }
+          >
+            <SelectTrigger id="time-column" className="w-full">
+              <SelectValue placeholder="None" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={NONE_VALUE}>None</SelectItem>
+              {columns.map((col) => (
+                <SelectItem key={col} value={col}>
+                  {col}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Used to detect time gaps between consecutive rows.
+          </p>
+        </div>
+
+        {/* Gap threshold input */}
         <div className="space-y-2">
           <Label htmlFor="gap-threshold">
             Insert blank row when time gap exceeds
@@ -60,7 +97,7 @@ export function GapThresholdCard({ config, onChange }: GapThresholdCardProps) {
           </div>
           {disabled ? (
             <p className="text-xs text-muted-foreground">
-              Requires a time column to be selected above.
+              Select a time column above to enable gap detection.
             </p>
           ) : inputError ? (
             <p className="text-xs text-destructive">{inputError}</p>

@@ -44,7 +44,14 @@ export default function App() {
     columns: string[],
     fileName: string,
     rawBuffer: ArrayBuffer,
+    savedConfig: Partial<AppConfig> | null,
   ) => {
+    const base = savedConfig
+      ? { ...defaultConfig(), ...savedConfig }
+      : {
+          ...defaultConfig(),
+          typeColumn: columns.find((c) => /type|category|cue.?type/i.test(c)) ?? "",
+        }
     setState((prev) => ({
       ...prev,
       step: "configure",
@@ -52,11 +59,7 @@ export default function App() {
       columns,
       fileName,
       rawBuffer,
-      config: {
-        ...defaultConfig(),
-        typeColumn:
-          columns.find((c) => /type|category|cue.?type/i.test(c)) ?? "",
-      },
+      config: base,
     }))
   }
 

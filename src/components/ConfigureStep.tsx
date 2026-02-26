@@ -128,7 +128,7 @@ export function ConfigureStep({
             onChange={patch}
           />
 
-          <GapThresholdCard config={config} onChange={patch} />
+          <GapThresholdCard config={config} columns={columns} onChange={patch} />
 
           <TitleBlockCard
             titleBlock={config.titleBlock}

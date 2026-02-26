@@ -4,6 +4,7 @@ import { Upload, FileSpreadsheet, AlertCircle } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { parseFile } from "@/lib/parseFile"
 import { cn } from "@/lib/utils"
+import type { AppConfig } from "@/types"
 
 interface UploadStepProps {
   onParsed: (
@@ -11,6 +12,7 @@ interface UploadStepProps {
     columns: string[],
     fileName: string,
     rawBuffer: ArrayBuffer,
+    savedConfig: Partial<AppConfig> | null,
   ) => void
 }
 
@@ -25,8 +27,8 @@ export function UploadStep({ onParsed }: UploadStepProps) {
       setError(null)
       setLoading(true)
       try {
-        const { rows, columns, rawBuffer } = await parseFile(file)
-        onParsed(rows, columns, file.name, rawBuffer)
+        const { rows, columns, rawBuffer, savedConfig } = await parseFile(file)
+        onParsed(rows, columns, file.name, rawBuffer, savedConfig)
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to parse file.")
       } finally {

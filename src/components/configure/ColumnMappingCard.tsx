@@ -15,8 +15,6 @@ interface ColumnMappingCardProps {
   onChange: (patch: Partial<AppConfig>) => void
 }
 
-const NONE_VALUE = "__none__"
-
 export function ColumnMappingCard({ columns, config, onChange }: ColumnMappingCardProps) {
   return (
     <Card>
@@ -45,31 +43,6 @@ export function ColumnMappingCard({ columns, config, onChange }: ColumnMappingCa
           </Select>
           <p className="text-xs text-muted-foreground">
             The column whose values determine the cue type (e.g. CUE TYPE, CATEGORY).
-          </p>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="time-column">Time column (optional)</Label>
-          <Select
-            value={config.timeColumn || NONE_VALUE}
-            onValueChange={(v) =>
-              onChange({ timeColumn: v === NONE_VALUE ? "" : v })
-            }
-          >
-            <SelectTrigger id="time-column" className="w-full">
-              <SelectValue placeholder="None" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={NONE_VALUE}>None</SelectItem>
-              {columns.map((col) => (
-                <SelectItem key={col} value={col}>
-                  {col}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground">
-            Used to detect time gaps between consecutive rows.
           </p>
         </div>
       </CardContent>
